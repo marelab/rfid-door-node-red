@@ -4,17 +4,20 @@ A complete Node Red Web Control to monitor &amp; control multiple rfid-door hard
 This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFID Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configured the needed setting right you get a Web GUI with the following functionality
 
 ##Dialog GUI to manage RFID devices
-![RFID-DOOR LIST](https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png)
+ <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png">
+
 
 ##Dialog GUI to manage Users of the devices
-![RFID-DOOR LIST](https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-user-list.png)
+ <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png">
 
 ##Dialog GUI to manage new Users 
-![RFID-DOOR LIST](https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-unknown-user.png)
+ <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-unknown-user.pngg">
+
 
 ##Dialog GUI to List events and acess trys of the devices
-![RFID-DOOR LIST](https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-access-log.png)
-![RFID-DOOR LIST](https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-event-log.png)
+ <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-access-log.png">
+ <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-event-log.png">
+
 
 All communication is done over MQTT. 
 
