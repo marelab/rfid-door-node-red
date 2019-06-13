@@ -4,14 +4,14 @@ A complete Node Red Web Control to monitor &amp; control multiple rfid-door hard
 This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFID Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configured the needed setting right you get a Web GUI with the following functionality
 
 ## Dialog GUI to manage RFID devices
-<img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png">
+<img src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png">
 
-```
 * New Devices are added automatic after they sync over MQTT
 * The List starts with the device name as link to the device Gui
 * The IP Adress of the device
 * Del | Door open | Sync Users to device | Sync Users form device | Delete Device Button
-```
+
+
 
 ## Dialog GUI to manage Users of the devices
 <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-user-list.png"/>
