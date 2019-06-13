@@ -5,6 +5,7 @@ This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFI
 
 ## Dialog GUI to manage RFID devices
 <img align="left" src="https://github.com/marelab/rfid-door-node-red/blob/master/images/gui-reader-list.png">
+* New Devices are added automatic after they sync over MQTT
 
 
 ## Dialog GUI to manage Users of the devices
