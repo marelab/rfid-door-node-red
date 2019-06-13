@@ -1,7 +1,7 @@
 # rfid-door-node-red
 A complete Node Red Web Control to monitor &amp; control multiple rfid-door hardware devices
 
-This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFID Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configure the needed setting you get a Web GUI with the following functionality. The hole communication is done over MQTT. 
+This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFID Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configure the needed setting you get a Web GUI with the following functionality. The hole communication is done over MQTT. The hole implementation might be optimaized in the future. The GUI can be also accessed over cell phone / tablett. Atm the focus was but to get it feature complete and not fancy as hell.
 
 # GUI Overview 
 
