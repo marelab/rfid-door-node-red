@@ -50,12 +50,19 @@ This instruction is based on a Node-Red Installation for Rasberry PI but should 
 You need the following tools to get the flow running:
 - marelab rfid-door firmware 
 - MySQL Database (stores devices, user & logs)
+- webserver & phpmysqladmin
 - MQTT Server
 
 ## Configure the marelab rfid-door device
+To use this workflow you must enable & configure MQTT on every rfid device that should be managed by this flow. If you want the central logging functionality you need to enable it to on the rfid-device see the screenshot as exmaple:
+
 
 ## Install the marelab rfid-door-node-red flow
+The installation is very easy just download it and import it over the node-red functionality like shown here.
 
 ## Configure the marelab rfid-door-node-red flow
-
+After the flow is installed you need to configure some items of the flow. That can't be done automatic. Follow these steps to get it to work correct:
+* Import the database shema / tables into mysql use the SQL rfidDb.sql for that
+* enter the DB IP adress & user/password in one of the DB nodes all other will then use that info automatic
+* enter the MQTT Server IP adress user/password in the MQTT nodes
 
