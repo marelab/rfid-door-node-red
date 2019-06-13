@@ -50,7 +50,7 @@ This instruction is based on a Node-Red Installation for Rasberry PI but should 
 You need the following tools to get the flow running:
 - marelab rfid-door firmware 
 - MySQL Database (stores devices, user & logs)
-- webserver & phpmysqladmin
+- webserver and  phpmyadmin
 - MQTT Server
 
 ## Configure the marelab rfid-door device
