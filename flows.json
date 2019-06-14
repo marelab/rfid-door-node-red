@@ -1,0 +1,2343 @@
+[
+    {
+        "id": "5da0880e.c537d",
+        "type": "tab",
+        "label": "RFID",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "6609ed16.bc3684",
+        "type": "mqtt in",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "/devnfc/sync",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "c264cdd5.9ebcc8",
+        "x": 150,
+        "y": 900,
+        "wires": [
+            [
+                "8845710b.a83d1"
+            ]
+        ]
+    },
+    {
+        "id": "f117dc63.eb4cd",
+        "type": "mqtt out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "/devnfc",
+        "qos": "2",
+        "retain": "false",
+        "broker": "c264cdd5.9ebcc8",
+        "x": 220,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "fbee6f99.1cca",
+        "type": "mqtt in",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "/devnfc/accesslist",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "c264cdd5.9ebcc8",
+        "x": 160,
+        "y": 1020,
+        "wires": [
+            [
+                "6dd39820.eab9e8"
+            ]
+        ]
+    },
+    {
+        "id": "e0f095d4.f88388",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 780,
+        "y": 1020,
+        "wires": [
+            [
+                "69c343cc.b2eedc"
+            ]
+        ]
+    },
+    {
+        "id": "6dd39820.eab9e8",
+        "type": "json",
+        "z": "5da0880e.c537d",
+        "name": "JSON2OBJ",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 370,
+        "y": 1020,
+        "wires": [
+            [
+                "bee5be3b.7e98f"
+            ]
+        ]
+    },
+    {
+        "id": "bee5be3b.7e98f",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "MakeMySQLinsert",
+        "func": "msg.topic = \"INSERT INTO users (uuid, user, acctype, validuntil) VALUES ('\"+msg.payload.uid+\"','\"+msg.payload.user+\"',\"+msg.payload.acctype+\",'\"+msg.payload.validuntil+\"')\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 1020,
+        "wires": [
+            [
+                "e0f095d4.f88388"
+            ]
+        ]
+    },
+    {
+        "id": "36748a74.8204a6",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 460,
+        "y": 780,
+        "wires": [
+            [
+                "cae0de7d.159e2"
+            ]
+        ]
+    },
+    {
+        "id": "4c3c3ea0.e4f7c",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "100 *ALL USERS",
+        "func": "msg.topic = \"SELECT * FROM users\";\nflow.set(\"doorip\", msg.payload.doorip);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 250,
+        "y": 780,
+        "wires": [
+            [
+                "36748a74.8204a6"
+            ]
+        ]
+    },
+    {
+        "id": "a05ffa44.6953f8",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "IterateUsers",
+        "func": "var person = new Object();\nperson.cmd        = \"adduser\";\nperson.doorip     = flow.get(\"doorip\");\nperson.uid        = msg.payload.uuid;\nperson.user       = msg.payload.user;\nperson.acctype    = msg.payload.acctype;\nperson.validuntil = msg.payload.validuntil;\n\nmsg.payload = person;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 850,
+        "y": 680,
+        "wires": [
+            [
+                "cae0de7d.159e2",
+                "45205e51.86309"
+            ]
+        ]
+    },
+    {
+        "id": "cae0de7d.159e2",
+        "type": "Serial Iterator",
+        "z": "5da0880e.c537d",
+        "name": "USER ITER",
+        "property": "payload",
+        "inputFlow": "input",
+        "saveOutput": 1,
+        "recursive": 0,
+        "storeId": 0,
+        "x": 670,
+        "y": 780,
+        "wires": [
+            [
+                "27bd83c9.c3fd3c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "27bd83c9.c3fd3c",
+        "type": "delay",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "200",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 880,
+        "y": 780,
+        "wires": [
+            [
+                "a05ffa44.6953f8"
+            ]
+        ]
+    },
+    {
+        "id": "8845710b.a83d1",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "SYNCtoDB",
+        "func": "\nif (msg.payload.type == \"heartbeat\")\n{\n    msg.topic = \"replace INTO readers (ip, doorname) VALUES ('\"+msg.payload.ip+\"','\"+msg.payload.door+\"');\";\n    return msg;\n}    \n\nmsg.payload = \" ???? \";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 370,
+        "y": 900,
+        "wires": [
+            [
+                "5338b911.e89a68"
+            ]
+        ]
+    },
+    {
+        "id": "5338b911.e89a68",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 580,
+        "y": 900,
+        "wires": [
+            [
+                "c4faea87.3efed8"
+            ]
+        ]
+    },
+    {
+        "id": "77b03cfe.286384",
+        "type": "mqtt in",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "/devnfc/send",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "c264cdd5.9ebcc8",
+        "x": 150,
+        "y": 1160,
+        "wires": [
+            [
+                "78d3b8cb.253d28"
+            ]
+        ]
+    },
+    {
+        "id": "704e364f.e28c28",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "10*Readers",
+        "func": "msg.topic = \"Select * from readers;\";\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 210,
+        "y": 100,
+        "wires": [
+            [
+                "cd9c0915.d9da08"
+            ]
+        ]
+    },
+    {
+        "id": "cd9c0915.d9da08",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "44ac504a.5324a",
+                "b23a5348.4cb",
+                "3030dbc.4b49c24"
+            ]
+        ]
+    },
+    {
+        "id": "44ac504a.5324a",
+        "type": "ui_template",
+        "z": "5da0880e.c537d",
+        "group": "f74cd7d7.b7cdc8",
+        "name": "GUI READER LIST",
+        "order": 1,
+        "width": "12",
+        "height": "3",
+        "format": "<style>\n  a:link    {color: #ffffff;}\n  a:visited {color: #999999;}\n  a:hover   {color: #ff3300;} \n  \n  .md-button.black-text {\n    color: black;\n  }\n\n  /* Metal ------------------------- */\n  \n  .metal {\n    position: relative;\n    margin: auto;\n    \n    text-align: center;\n    color: hsla(0,0%,20%,1);\n    text-shadow:\n      hsla(0,0%,40%,.5) 0 -1px 0,\n      hsla(0,0%,100%,.6) 0 2px 1px;\n    \n    background-color: hsl(0,0%,90%);\n    box-shadow:\n      inset hsla(0,0%,15%,  1) 0  0px 0px 2px, /* border */\n      inset hsla(0,0%,15%, .8) 0 -1px 3px 2px, /* soft SD */\n      inset hsla(0,0%,0%, .25) 0 -1px 0px 3px, /* bottom SD */\n      inset hsla(0,0%,100%,.7) 0  2px 1px 3px, /* top HL */\n      \n      hsla(0,0%, 0%,.15) 0 -2px 3px 2px, /* outer SD */\n      hsla(0,0%,100%,.5) 0  2px 3px 2px; /* outer HL */ \n\n    transition: color .2s;\n  }\n  \n  /* Linear ------------------------- */\n\n  .metal.linear {\n    width: 40px;\n    height: 40px;\n    font-size: 1.2em;\n    border-radius: .5em;\n    background-image:\n      -webkit-repeating-linear-gradient(left, hsla(0,0%,100%,0) 0%, hsla(0,0%,100%,0)   6%, hsla(0,0%,100%, .1) 7.5%),\n      -webkit-repeating-linear-gradient(left, hsla(0,0%,  0%,0) 0%, hsla(0,0%,  0%,0)   4%, hsla(0,0%,  0%,.03) 4.5%),\n      -webkit-repeating-linear-gradient(left, hsla(0,0%,100%,0) 0%, hsla(0,0%,100%,0) 1.2%, hsla(0,0%,100%,.15) 2.2%),\n      \n      linear-gradient(180deg,\n      hsl(0,0%,78%)  0%, \n      hsl(0,0%,90%) 47%, \n      hsl(0,0%,78%) 53%,\n      hsl(0,0%,70%)100%);\n  }\n    \n  /* Wide ------------------------- */\n\n  .metal.wide {\n    width: 90px;\n    height: 40px;\n  }\n\n  /* active ------------------------- */\n\n  .metal:active {\n    color: hsl(210, 100%, 40%);\n    text-shadow:\n      hsla(210,100%,20%,.3) 0 -1px 0,\n      hsl(210,100%,85%) 0 2px 1px,\n      hsla(200,100%,80%,1) 0 0 5px,\n      hsla(210,100%,50%,.6) 0 0 20px;\n    box-shadow: \n      inset hsla(210,100%,30%,  1) 0  0px 0px 2px, /* border */\n      inset hsla(210,100%,15%, .4) 0 -1px 3px 2px, /* soft SD */\n      inset hsla(210,100%,20%,.25) 0 -1px 0px 3px, /* bottom SD */\n      inset hsla(210,100%,100%,.7) 0  2px 1px 3px, /* top HL */\n      \n      hsla(210,100%,75%, .8) 0  0px 3px 2px, /* outer SD */\n      hsla(210,50%,40%, .25) 0 -2px 3px 2px, /* outer SD */\n      hsla(210,80%,95%,   1) 0  2px 3px 2px; /* outer HL */\n  }   \n\n</style>\n\n<script>\n    scope.buttons = [{\n        icon: 'pause', color: 'black',\n        icon2: 'play_arrow', color2: 'red',\n        payload: 'play',\n    }, {\n        icon: 'alarm', color: 'black',\n        icon2: 'alarm', color2: 'red',\n        payload: 'alarm',\n    }];\n    \n    scope.click = function(b) {\n        var json = new Object();\n        json.cmd = 'opendoor';\n        json.ip  = b;\n        //this.msg.payload = json;\n        alert(b); \n    }.bind(scope);\n    //click(door.ip)\n</script>\n<div layout=\"column\" layout-fill >\n  <md-content>\n    <md-list-item ng-repeat=\"door in msg.payload\">\n        <div flex=\"40\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <a href=\"http://{{door.ip}}\" class=\"md-body-1\">{{door.doorname}}</a>\n        </div>\n        <div flex=\"40\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"md-body-1\">{{door.ip}}</i>\n        </div>\n        <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"fa fa-trash\" aria-hidden=\"true\"  ng-click=\"send({payload:{cmd:'deletedoor',doorip:door.ip}})\"></i>\n        </div>\n        <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"fa fa-unlock\" aria-hidden=\"true\"  ng-click=\"send({payload:{cmd:'opendoor',doorip:door.ip}})\"></i>\n        </div>\n        <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"fa fa-download\" aria-hidden=\"true\"  ng-click=\"send({payload:{cmd:'getuser',doorip:door.ip}})\"></i>\n        </div>\n        <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"fa fa-upload\" aria-hidden=\"true\"  ng-click=\"send({payload:{cmd:'sync',doorip:door.ip}})\"></i>\n        </div>\n        <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\" md-colors=\"{color: 'red-A100'}\">\n            <i class=\"fa fa-times\" aria-hidden=\"true\"  ng-click=\"send({payload:{cmd:'deletusers',doorip:door.ip}})\"></i>\n        </div>\n    </md-list-item>\n  </md-content>\n</div>\n\n\n  \n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "templateScope": "local",
+        "x": 690,
+        "y": 100,
+        "wires": [
+            [
+                "8ec7d22e.f9403"
+            ]
+        ]
+    },
+    {
+        "id": "b1d4a132.801f8",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "20*users",
+        "func": "msg.topic = \"Select * from users;\";\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 200,
+        "y": 260,
+        "wires": [
+            [
+                "b080907b.edfc2"
+            ]
+        ]
+    },
+    {
+        "id": "78234a57.6f1194",
+        "type": "ui_template",
+        "z": "5da0880e.c537d",
+        "group": "27ac83fc.9d43cc",
+        "name": "GUI USER LIST",
+        "order": 1,
+        "width": "12",
+        "height": "10",
+        "format": "<div layout=\"column\" layout-fill >\n  <md-content>\n    <md-list-item ng-repeat=\"users in msg.payload\">\n         <div flex=\"15\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\">{{users.uuid}}</i>\n         </div>\n         <div flex=\"40\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\">{{users.user}}</i>\n         </div>\n         <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\">{{users.acctype}}</i>\n         </div>\n         <div flex=\"20\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\">{{users.validuntil * 1000 |  date:'MM/dd/yyyy'}}</i>\n         </div>\n         <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"fa fa-trash\" aria-hidden=\"true\" ng-click=\"send({payload:{cmd:'delete',user:users.uuid}})\"></i>\n         </div>\n         <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\" ng-click=\"editUser(users)\"></i>\n         </div>\n    </md-list-item>\n    <md-button type=\"submit\" class=\"md-primary\" ng-click=\"send({payload:{cmd:'syncall'}})\">Sync to all Readers</md-button>\n  </md-content>\n</div>\n\n\n<!-- The Modal -->\n<div id=\"userModal\" class=\"modal\">\n  <!-- Modal content -->\n  <div class=\"modal-content\">\n    <div class=\"modal-header\">\n      <span class=\"close\">&times;</span>\n      <span class=\"dialogheader\">Add User Access</span>\n    </div>\n    <div class=\"modal-body\">\n        <label class=\"infotext\">Some text in the Modal Body</label>\n        <form name=\"useraddForm\">\n         <div layout-gt-xs=\"row\" md-theme=\"docs-dark\" layout-padding=\"\">\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>RFID UUID</label>\n                <input type=\"text\" ng-model=\"uid\"  name=\"uid\" id=\"uid\"  disabled=\"\" value=\"{{uid}}\">\n            </md-input-container>\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>Username:</label>\n                <input type=\"text\" class=\"md-body-1\"  ng-model=\"username\" name=\"username\" id=\"username\" required=\"\">\n                <div ng-messages=\"useraddForm.username.$error\">\n                    <div ng-message=\"required\">This is required.</div>\n                </div>\n            </md-input-container>\n        </div>\n        <div layout-gt-xs=\"row\" md-theme=\"docs-dark\" layout-padding=\"\">\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>Valid until</label>\n                <md-datepicker ng-model=\"validuntil\" name=\"validuntil\" id=\"validuntil\"  required=\"\">{{ validuntil | date : \"dd.MM.y\" }}</md-datepicker>\n            </md-input-container>\n            <md-input-container flex=\"50\">\n                <label>Project Type</label>\n                 <md-select name=\"type\" ng-model=\"accesstype\" required=\"\" class=\"dropdown-menu model-top\" id=\"accesstype\">\n                    <md-option class=\"dropdown-menu model-top\" value=\"user\">normal</md-option>\n                    <md-option class=\"dropdown-menu model-top\" value=\"admin\">admin</md-option>\n                </md-select>\n            </md-input-container>\n        </div>\n        <md-button type=\"submit\" class=\"md-primary\" ng-click=\"SendCloseUserDlg(msg)\">Add User</md-button>\n        </form>\n      </div>\n    </div>\n  </div>\n\n<script>\n(function($scope) {\n    $scope.editUser = function(users) {\n        //alert(\"UID:\"+users.uuid +\" user:\" +users.user);\n        $scope.uid = users.uuid;\n        $scope.username = users.user;\n        var date =  new Date( users.validuntil*1000).toDateString();\n        //var date = new Date(unix_timestamp*1000);\n        $scope.validuntil = date;\n        if (users.acctype==\"99\")\n            $scope.accesstype = \"admin\";\n        else\n            $scope.accesstype = \"user\";\n        modalUser.style.display = \"block\";\n    };\n    \n    \n    $scope.SendCloseUserDlg = function(unknownuser) {\n        var date = Date.parse($scope.validuntil);\n        $scope.send({payload:{cmd:'change',uuid:$scope.uid,user:$scope.username,valid:(date/1000),type:$scope.accesstype}});\n        modalUser.style.display = \"none\";\n    };\n    \n    $scope.changeDate = function(newDate){\n        $scope.validuntil =  newDate;\n    }\n})(scope);\n\n\n    // Get the modal\nvar modalUser = document.getElementById('userModal');\n\n// Get the button that opens the modal\nvar btn = document.getElementById(\"myBtn\");\n\n// Get the <span> element that closes the modal\nvar span = document.getElementsByClassName(\"close\")[0];\n\n\n// When the user clicks on <span> (x), close the modal\nspan.onclick = function() {\n    modalUser.style.display = \"none\";\n}\n\n</script>\n\n\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "templateScope": "local",
+        "x": 680,
+        "y": 260,
+        "wires": [
+            [
+                "863979b6.693e38"
+            ]
+        ]
+    },
+    {
+        "id": "b080907b.edfc2",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 380,
+        "y": 260,
+        "wires": [
+            [
+                "78234a57.6f1194",
+                "8e081880.a1e0a8"
+            ]
+        ]
+    },
+    {
+        "id": "8509d636.4ff248",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "DEL USER",
+        "func": "if (msg.payload.cmd==\"delete\"){\n    msg.topic   = \"DELETE FROM users WHERE uuid='\"+msg.payload.user+\"';\";\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1110,
+        "y": 220,
+        "wires": [
+            [
+                "34a7bfce.97c8e"
+            ]
+        ]
+    },
+    {
+        "id": "34a7bfce.97c8e",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 1380,
+        "y": 260,
+        "wires": [
+            [
+                "72570b0a.4897b4"
+            ]
+        ]
+    },
+    {
+        "id": "8ec7d22e.f9403",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "payload.cmd",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "getuser",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "opendoor",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "sync",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "deletusers",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "deletedoor",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 910,
+        "y": 100,
+        "wires": [
+            [
+                "80ae6453.e47798"
+            ],
+            [
+                "80ae6453.e47798"
+            ],
+            [
+                "c38ac048.df19d"
+            ],
+            [
+                "80ae6453.e47798"
+            ],
+            [
+                "5eb3c1d2.5ba3b"
+            ]
+        ]
+    },
+    {
+        "id": "93ca91b1.d4eb",
+        "type": "cast-to-client",
+        "z": "5da0880e.c537d",
+        "name": "Google Home Voice MSG",
+        "url": "",
+        "contentType": "",
+        "message": "",
+        "language": "de",
+        "ip": "192.168.2.60",
+        "port": "",
+        "volume": "50",
+        "x": 1090,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bea8e868.509ee8",
+        "type": "google-tts",
+        "z": "5da0880e.c537d",
+        "name": "TextToSpeech",
+        "inputField": "payload",
+        "inputFieldType": "msg",
+        "outputField": "url",
+        "outputFieldType": "msg",
+        "languageField": "de",
+        "languageFieldType": "str",
+        "speedField": "1",
+        "speedFieldType": "num",
+        "x": 840,
+        "y": 1160,
+        "wires": [
+            [
+                "93ca91b1.d4eb"
+            ]
+        ]
+    },
+    {
+        "id": "78d3b8cb.253d28",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Check if user is known",
+        "func": "// Access log on node-red\nif ((msg.payload.type == \"access\") && (msg.payload.isKnown == \"true\")){\n    if (msg.payload.cmd == \"log\"){\n        msg.topic = \"INSERT INTO accesslog (uid, type, isknown, username,door,time) VALUES ('\"+msg.payload.uid+\"','\"+msg.payload.type+\"',\"+msg.payload.isKnown+\",'\"+msg.payload.username+\"','\"+msg.payload.door+\"','\"+msg.payload.time+\"')\";\n    }\n    msg.payload = \"Tür von \"+ msg.payload.username+ \" geöffnet\";\n    return msg;\n}\n// adding event\nelse if(msg.payload.cmd == \"event\"){\n    msg.topic = \"INSERT INTO events (type, src, description, data,time,door) VALUES ('\"+msg.payload.type+\"','\"+msg.payload.src+\"','\"+msg.payload.desc+\"','\"+msg.payload.data+\"','\"+msg.payload.time+\"','\"+msg.payload.door +\"')\";\n    msg.paylod = \"\";\n    return msg;\n}\n// user unknown with out log\nelse if((msg.payload.type == \"access\") &&(msg.payload.isKnown==\"false\"))\n{\n    // user unknown adding to newuser db\n    if (msg.payload.cmd == \"log\"){\n        msg.topic = \"INSERT INTO accesslog (uid, type, isknown, username,door,time) VALUES ('\"+msg.payload.uid+\"','\"+msg.payload.type+\"',\"+msg.payload.isKnown+\",'\"+msg.payload.username+\"','\"+msg.payload.door+\"','\"+msg.payload.time+\"');\" + \" INSERT INTO newuser (uid, type, isknown, username,door,time) VALUES ('\"+msg.payload.uid+\"','\"+msg.payload.type+\"',\"+msg.payload.isKnown+\",'\"+msg.payload.username+\"','\"+msg.payload.door+\"','\"+msg.payload.time+\"');\";\n    }\n    else{\n        msg.topic = \"INSERT INTO newuser (uid, type, isknown, username,door,time) VALUES ('\"+msg.payload.uid+\"','\"+msg.payload.type+\"',\"+msg.payload.isKnown+\",'\"+msg.payload.username+\"','\"+msg.payload.door+\"','\"+msg.payload.time+\"')\";\n    }\n    msg.payload = \"Kein Zugang User unbekannt\";\n    return msg;\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 1160,
+        "wires": [
+            [
+                "93035a62.342298",
+                "1ab00e98.cef0c1",
+                "bea8e868.509ee8"
+            ]
+        ]
+    },
+    {
+        "id": "25e4887.0c12178",
+        "type": "http in",
+        "z": "5da0880e.c537d",
+        "name": "opendoor",
+        "url": "/opendoor",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 1300,
+        "wires": [
+            [
+                "d2a1fa23.2e47e8"
+            ]
+        ]
+    },
+    {
+        "id": "d2a1fa23.2e47e8",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "VOICE DOOR OPEN",
+        "func": "var doors = flow.get(\"doors\");\nvar voiceDoor = \"\";\nvar sysDoor = \"\"; \nvoiceDoor = msg.payload.obj;\n\nfor (index = 0; index < doors.length; ++index) {\n  sysDoor = doors[index].doorname.toString().toLowerCase();\n  voiceDoor = voiceDoor.toLowerCase();\n  if (sysDoor==voiceDoor)\n  {\n     msg.payload.cmd = \"opendoor\";\n     msg.payload.doorip = doors[index].ip.toString();\n     return msg;\n  }\n // msg.payload = sysDoor +\" \" +voiceDoor;\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 380,
+        "y": 1300,
+        "wires": [
+            [
+                "ceb9b5e0.48edb8"
+            ]
+        ]
+    },
+    {
+        "id": "b23a5348.4cb",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "SET doors",
+        "func": "flow.set(\"doors\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 670,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "25527db2.d91872",
+        "type": "ui_template",
+        "z": "5da0880e.c537d",
+        "group": "9f2672e3.3b8cd",
+        "name": "GUI NEW USERS",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "format": "<style>\nbody {font-family: Arial, Helvetica, sans-serif;}\n\n/* The Modal (background) */\n.modal {\n    display: none; /* Hidden by default */\n    position: fixed; /* Stay in place */\n    opacity:0.99;\n    z-index: 100; /* Sit on top */\n    padding-top: 100px; /* Location of the box */\n    left: 0;\n    top: 0;\n    width: 100%; /* Full width */\n    height: 100%; /* Full height */\n    overflow: auto; /* Enable scroll if needed */\n    background-color:  rgba(0,0,0,0.99) /* Fallback color */\n    background-color: rgba(0,0,0,0.99); /* Black w/ opacity */\n}\n/* Modal Content */\n.modal-content {\n    position: relative;\n    background-color: #fefefe;\n    margin: auto;\n    padding: 0;\n    border: 0px solid #FFFFFF;\n    width: 50%;\n    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);\n    -webkit-animation-name: animatetop;\n    -webkit-animation-duration: 0.4s;\n    animation-name: animatetop;\n    animation-duration: 0.4s\n}\n\n\n/* Add Animation */\n@-webkit-keyframes animatetop {\n    from {top:-300px; opacity:0} \n    to {top:0; opacity:1}\n}\n\n@keyframes animatetop {\n    from {top:-300px; opacity:0}\n    to {top:0; opacity:1}\n}\n\n/* The Close Button */\n.close {\n    color: white;\n    float: right;\n    font-size: 28px;\n    font-weight: bold;\n}\n\n.close:hover,\n.close:focus {\n    color: #000;\n    text-decoration: none;\n    cursor: pointer;\n}\n\n.modal-header {\n    padding: 0px 0px;\n    background-color: #097479;\n}\n\n.modal-body {\n    padding: 10px 10px;\n    background-color: #097479;\n}\n\n.dropdown-menu.model-top{\n    z-index:101;\n}\n\n.md-select-menu-container { \n    z-index: 99999 !important; \n    \n}\n\n.infotext{\n    color: white;\n    background-color: #097479;\n}\n\n.dialogheader {\n    background-color: #222222 !important;\n    margin-top: 0px  !important;\n    margin-right: 0px;\n    margin-bottom: 0px  !important;\n    margin-left: 0px;\n    margin: 0px !important;\n}\n}\n\n</style>\n\n<div layout=\"column\" layout-fill >\n  <md-content>\n    <md-list-item ng-repeat=\"newusers in msg.payload\" id = $index ng-click=\"\">\n         <div flex=\"20\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\" >{{newusers.uid}}</i>\n         </div>\n         <div flex=\"20\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\" contenteditable=\"true\">{{newusers.user}}unknown</i>\n         </div>\n         <div flex=\"20\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\" contenteditable=\"true\">{{newusers.door}}</i>\n         </div>\n          <div flex=\"20\" class=\"md-list-item-text\" layout=\"row\">\n            <i class=\"md-body-1\">{{newusers.time * 1000 |  date:'MM/dd/yyyy'}}</i>\n         </div>\n         <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\">\n          <i class=\"fa fa-check-circle-o\" aria-hidden=\"true\" ng-click=\"addUidToDbRow(newusers)\"></i>\n         </div>\n         <div flex=\"10\" class=\"md-list-item-text\" layout=\"row\">\n          <i class=\"fa fa-trash\" aria-hidden=\"true\" ng-click=\"delteRow(newusers)\"></i>\n         </div>\n    </md-list-item>\n  </md-content>\n</div>\n\n\n<!-- The Modal -->\n<div id=\"myModal\" class=\"modal\">\n  <!-- Modal content -->\n  <div class=\"modal-content\">\n    <div class=\"modal-header\">\n      <span class=\"close\">&times;</span>\n      <span class=\"dialogheader\">Add User Access</span>\n    </div>\n    <div class=\"modal-body\">\n        <label class=\"infotext\">Some text in the Modal Body</label>\n        <form name=\"useraddForm\">\n         <div layout-gt-xs=\"row\" md-theme=\"docs-dark\" layout-padding=\"\">\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>RFID UUID</label>\n                <input type=\"text\" ng-model=\"uid\"  name=\"uid\" id=\"uid\"  disabled=\"\" value=\"{{newusers.uid}}\">{{newusers.uid}}\n            </md-input-container>\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>Username:</label>\n                <input type=\"text\" class=\"md-body-1\"  ng-model=\"username\" name=\"username\" id=\"username\" required=\"\">\n                <div ng-messages=\"useraddForm.username.$error\">\n                    <div ng-message=\"required\">This is required.</div>\n                </div>\n            </md-input-container>\n        </div>\n        <div layout-gt-xs=\"row\" md-theme=\"docs-dark\" layout-padding=\"\">\n            <md-input-container class=\"md-block\" flex-gt-xs=\"\">\n                <label>Valid until</label>\n                <md-datepicker ng-model=\"validuntil\" name=\"validuntil\" id=\"validuntil\"  required=\"\">{{ validuntil | date : \"dd.MM.y\" }}</md-datepicker>\n            </md-input-container>\n            <md-input-container flex=\"50\">\n                <label>Project Type</label>\n                 <md-select name=\"type\" ng-model=\"accesstype\" required=\"\" class=\"dropdown-menu model-top\" id=\"accesstype\">\n                    <md-option class=\"dropdown-menu model-top\" value=\"user\">normal</md-option>\n                    <md-option class=\"dropdown-menu model-top\" value=\"admin\">admin</md-option>\n                </md-select>\n            </md-input-container>\n        </div>\n        <md-button type=\"submit\" class=\"md-primary\" ng-click=\"SendCloseUserDlg(msg)\">Add User</md-button>\n        </form>\n      </div>\n    </div>\n  </div>\n\n<script>\n(function($scope) {\n    $scope.delteRow = function(unknownuser) {\n        $scope.send({payload:{cmd:'delete',uuid:unknownuser.uid}});\n    };\n    \n    $scope.addUidToDbRow = function(unknownuser) {\n        // alert(\"UID:\"+unknownuser.uid +\" user:\" +$scope.username+\" valid:\" + $scope.validuntil+\" access:\"+$scope.accesstype);\n        $scope.uid = unknownuser.uid;\n        modal.style.display = \"block\";\n    };\n    $scope.SendCloseUserDlg = function(unknownuser) {\n        //alert(\"close\" + unknownuser.payload.uid);\n        //var uid         = document.getElementById(\"uid\").value;\n        //var username    = document.getElementById(\"username\").value;\n        //var validuntil  = document.getElementById(\"validuntil\").value;\n        //var accesstype  = document.getElementById(\"accesstype\").value;\n         \n        //alert(\"UID:\"+$scope.uid +\" user:\" +$scope.username+\" valid:\" + $scope.validuntil+\" access:\"+$scope.accesstype);\n        var date = Date.parse($scope.validuntil);\n   \n        $scope.send({payload:{cmd:'add',uuid:$scope.uid,user:$scope.username,valid:(date/1000),type:$scope.accesstype}});\n        modal.style.display = \"none\";\n    };\n    $scope.changeDate = function(newDate){\n        $scope.validuntil =  newDate;\n    }\n})(scope);\n\n\n    // Get the modal\nvar modal = document.getElementById('myModal');\n\n// Get the button that opens the modal\nvar btn = document.getElementById(\"myBtn\");\n\n// Get the <span> element that closes the modal\nvar span = document.getElementsByClassName(\"close\")[0];\n\n\n// When the user clicks on <span> (x), close the modal\nspan.onclick = function() {\n    modal.style.display = \"none\";\n}\n\n</script>\n\n\n\n",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "templateScope": "local",
+        "x": 690,
+        "y": 520,
+        "wires": [
+            [
+                "b3c0c90b.4f8fc8"
+            ]
+        ]
+    },
+    {
+        "id": "508f0b61.02bfc4",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door-userUnknown",
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "25527db2.d91872"
+            ]
+        ]
+    },
+    {
+        "id": "37ec6a44.a37916",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "30*newusers",
+        "func": "msg.topic = \"Select * from newuser\";\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 210,
+        "y": 520,
+        "wires": [
+            [
+                "508f0b61.02bfc4"
+            ]
+        ]
+    },
+    {
+        "id": "5eb3c1d2.5ba3b",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Delete Door",
+        "func": "msg.topic = \"DELETE FROM readers WHERE ip='\"+msg.payload.doorip+\"';\";\nflow.set(\"doorip\", msg.payload.doorip);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1210,
+        "y": 120,
+        "wires": [
+            [
+                "7308952b.614fac"
+            ]
+        ]
+    },
+    {
+        "id": "7308952b.614fac",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 1355,
+        "y": 120,
+        "wires": [
+            [
+                "a386d64f.08b708"
+            ]
+        ],
+        "l": false
+    },
+    {
+        "id": "85243abc.fe2f08",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "L_10",
+        "links": [
+            "a386d64f.08b708",
+            "c4faea87.3efed8"
+        ],
+        "x": 75,
+        "y": 100,
+        "wires": [
+            [
+                "704e364f.e28c28"
+            ]
+        ]
+    },
+    {
+        "id": "a386d64f.08b708",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "85243abc.fe2f08"
+        ],
+        "x": 1515,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "2dbc57f6.171838",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "L_20",
+        "links": [
+            "69c343cc.b2eedc",
+            "72570b0a.4897b4",
+            "be205a5f.b1b658"
+        ],
+        "x": 75,
+        "y": 260,
+        "wires": [
+            [
+                "b1d4a132.801f8"
+            ]
+        ]
+    },
+    {
+        "id": "72570b0a.4897b4",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "2dbc57f6.171838"
+        ],
+        "x": 1515,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "c4faea87.3efed8",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "85243abc.fe2f08"
+        ],
+        "x": 695,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "69c343cc.b2eedc",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "2dbc57f6.171838"
+        ],
+        "x": 915,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "c38ac048.df19d",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "11511bfd.2c0d04"
+        ],
+        "x": 1255,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "11511bfd.2c0d04",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "L_100",
+        "links": [
+            "c38ac048.df19d",
+            "b3ef853e.13f528"
+        ],
+        "x": 95,
+        "y": 780,
+        "wires": [
+            [
+                "4c3c3ea0.e4f7c"
+            ]
+        ]
+    },
+    {
+        "id": "8829206d.fe1ff",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "RFID_MQTT_OUT",
+        "links": [
+            "45205e51.86309",
+            "80ae6453.e47798",
+            "ceb9b5e0.48edb8"
+        ],
+        "x": 95,
+        "y": 720,
+        "wires": [
+            [
+                "f117dc63.eb4cd"
+            ]
+        ]
+    },
+    {
+        "id": "80ae6453.e47798",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "8829206d.fe1ff"
+        ],
+        "x": 1255,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "45205e51.86309",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "8829206d.fe1ff"
+        ],
+        "x": 995,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "ceb9b5e0.48edb8",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "8829206d.fe1ff"
+        ],
+        "x": 555,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "e7a9ca4f.5799b8",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "DB Selects for User, Readers to fill template",
+        "info": "",
+        "x": 190,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "7d4d49f7.a57728",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Iterates over user and sends them over MQTT to a Device",
+        "info": "",
+        "x": 250,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "1ad982b5.57decd",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Recv Sync over MQTT and writs unknow Reader to DB",
+        "info": "",
+        "x": 240,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "b3addda4.3e246",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Recv userlist of a Reader and inserts into DB",
+        "info": "",
+        "x": 210,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "b817fe32.f93e4",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Recv access event over MQTT",
+        "info": "",
+        "x": 170,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "2dde2749.f120d8",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Google Voice Command to open a door ",
+        "info": "",
+        "x": 190,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "b3c0c90b.4f8fc8",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "payload.cmd",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "delete",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "add",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 910,
+        "y": 520,
+        "wires": [
+            [
+                "f2059899.69b328"
+            ],
+            [
+                "1b3f5681.d5de79"
+            ]
+        ]
+    },
+    {
+        "id": "f2059899.69b328",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "SQL Del new user",
+        "func": "if (msg.payload.cmd==\"delete\"){\n    var uuid = msg.payload.uuid;\n    msg.payload = \"DELTE NEWUSER\"\n    msg.topic   = \"DELETE FROM newuser WHERE uid='\"+uuid+\"';\";\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1110,
+        "y": 480,
+        "wires": [
+            [
+                "8c1b6cab.0320f"
+            ]
+        ]
+    },
+    {
+        "id": "8c1b6cab.0320f",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 1400,
+        "y": 520,
+        "wires": [
+            [
+                "76d1bd85.2eed64"
+            ]
+        ]
+    },
+    {
+        "id": "36d1ce90.0ebc42",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "L_30",
+        "links": [
+            "15104682.e46449",
+            "7a6e89ba.af0c98",
+            "b329b1e4.73a9"
+        ],
+        "x": 75,
+        "y": 520,
+        "wires": [
+            [
+                "37ec6a44.a37916"
+            ]
+        ]
+    },
+    {
+        "id": "1b3f5681.d5de79",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "SQL Add User for access",
+        "func": "if (msg.payload.cmd==\"add\"){\n    var uuid = msg.payload.uuid;\n    var name  = msg.payload.name;\n    var type = \"\";\n    if (msg.payload.type==\"admin\")\n        type = \"99\";\n    else\n        type = \"1\";\n    msg.topic = \"INSERT INTO users (uuid, user, acctype, validuntil) VALUES ('\"+msg.payload.uuid+\"','\"+msg.payload.user+\"','\"+type+\"','\"+msg.payload.valid+\"')\";\n}\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1130,
+        "y": 540,
+        "wires": [
+            [
+                "9a9490a7.07229",
+                "8c1b6cab.0320f"
+            ]
+        ]
+    },
+    {
+        "id": "be205a5f.b1b658",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "2dbc57f6.171838"
+        ],
+        "x": 1695,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "41d9ad6f.fdf554",
+        "type": "inject",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "x": 150,
+        "y": 340,
+        "wires": [
+            [
+                "37ec6a44.a37916",
+                "b1d4a132.801f8",
+                "704e364f.e28c28"
+            ]
+        ]
+    },
+    {
+        "id": "9a9490a7.07229",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "40 SQL Del newuser ",
+        "func": "if (msg.payload.cmd==\"add\"){\n    var uuid = msg.payload.uuid;\n    msg.topic   = \"DELETE FROM newuser WHERE uid='\"+uuid+\"';\";\n }\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1120,
+        "y": 600,
+        "wires": [
+            [
+                "8c1b6cab.0320f"
+            ]
+        ]
+    },
+    {
+        "id": "9c6b2990.0a8528",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "20*users",
+        "func": "msg.topic = \"Select * from users;\";\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1180,
+        "y": 940,
+        "wires": [
+            [
+                "d6115e2a.d877f"
+            ]
+        ]
+    },
+    {
+        "id": "d6115e2a.d877f",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 1340,
+        "y": 940,
+        "wires": [
+            [
+                "bebaa6f9.d7a698"
+            ]
+        ]
+    },
+    {
+        "id": "6e35c1b2.06214",
+        "type": "json",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": true,
+        "x": 1650,
+        "y": 940,
+        "wires": [
+            [
+                "b745abf2.3b4248"
+            ]
+        ]
+    },
+    {
+        "id": "4371b96f.18e288",
+        "type": "inject",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 1020,
+        "y": 940,
+        "wires": [
+            [
+                "9c6b2990.0a8528",
+                "d126cf5.724c73"
+            ]
+        ]
+    },
+    {
+        "id": "b745abf2.3b4248",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "func": "flow.set(\"RFID_Users\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1820,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d126cf5.724c73",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "20*users",
+        "func": "msg.topic = \"Select * from readers;\";\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1180,
+        "y": 1000,
+        "wires": [
+            [
+                "d6115e2a.d877f"
+            ]
+        ]
+    },
+    {
+        "id": "d5b6f03.c3ba11",
+        "type": "json",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "payload",
+        "action": "str",
+        "pretty": true,
+        "x": 1650,
+        "y": 1000,
+        "wires": [
+            [
+                "6ac6a90.4fb6758"
+            ]
+        ]
+    },
+    {
+        "id": "6ac6a90.4fb6758",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "func": "flow.set(\"RFID_readers\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1820,
+        "y": 1000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "863979b6.693e38",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "payload.cmd",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "delete",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "change",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "syncall",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 910,
+        "y": 260,
+        "wires": [
+            [
+                "8509d636.4ff248"
+            ],
+            [
+                "1e1335d6.41dada"
+            ],
+            [
+                "3b2c4359.3d54cc"
+            ]
+        ]
+    },
+    {
+        "id": "1e1335d6.41dada",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "CHANGE USER",
+        "func": "if (msg.payload.cmd==\"change\"){\n    var type = \"\";\n    if (msg.payload.type==\"admin\")\n        type = \"99\";\n    else\n        type = \"1\";\n    msg.topic = \"REPLACE INTO users (uuid, user, acctype, validuntil) VALUES ('\"+msg.payload.uuid+\"','\"+msg.payload.user+\"','\"+type+\"','\"+msg.payload.valid+\"')\";\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1120,
+        "y": 260,
+        "wires": [
+            [
+                "34a7bfce.97c8e"
+            ]
+        ]
+    },
+    {
+        "id": "3b2c4359.3d54cc",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "SYNC al RFID Reader with DB",
+        "func": "// Send Userlist to all rfid readers\nmsg.payload = flow.get(\"RFID_Readers\");\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1170,
+        "y": 380,
+        "wires": [
+            [
+                "cc886e50.a8b02"
+            ]
+        ]
+    },
+    {
+        "id": "8e081880.a1e0a8",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "FLOW Set RFID_Users",
+        "func": "flow.set(\"RFID_Users\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 710,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3030dbc.4b49c24",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "FLOW Set RFID_Readers",
+        "func": "flow.set(\"RFID_Readers\",msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 710,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ca61b0ce.bc601",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "IterateReaders",
+        "func": "msg.payload.doorip = msg.payload.ip;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1480,
+        "y": 320,
+        "wires": [
+            [
+                "cc886e50.a8b02",
+                "b3ef853e.13f528"
+            ]
+        ]
+    },
+    {
+        "id": "cc886e50.a8b02",
+        "type": "Serial Iterator",
+        "z": "5da0880e.c537d",
+        "name": "REARDE ITER",
+        "property": "payload",
+        "inputFlow": "input",
+        "saveOutput": 1,
+        "recursive": 0,
+        "storeId": 0,
+        "x": 1440,
+        "y": 380,
+        "wires": [
+            [
+                "7edc5af0.ec31f4"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7edc5af0.ec31f4",
+        "type": "delay",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "200",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 1660,
+        "y": 380,
+        "wires": [
+            [
+                "ca61b0ce.bc601"
+            ]
+        ]
+    },
+    {
+        "id": "b3ef853e.13f528",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "11511bfd.2c0d04"
+        ],
+        "x": 1635,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "67a4d7c0.422c98",
+        "type": "inject",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "704e364f.e28c28",
+                "b1d4a132.801f8",
+                "37ec6a44.a37916"
+            ]
+        ]
+    },
+    {
+        "id": "d0ff54fc.98bd98",
+        "type": "cast-to-client",
+        "z": "5da0880e.c537d",
+        "name": "Google Home Voice MSG",
+        "url": "",
+        "contentType": "",
+        "message": "",
+        "language": "de",
+        "ip": "192.168.2.59",
+        "port": "",
+        "volume": "100",
+        "x": 1090,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "80fdc09a.7b5f1",
+        "type": "google-tts",
+        "z": "5da0880e.c537d",
+        "name": "TextToSpeech",
+        "inputField": "payload",
+        "inputFieldType": "msg",
+        "outputField": "url",
+        "outputFieldType": "msg",
+        "languageField": "de",
+        "languageFieldType": "str",
+        "speedField": "1",
+        "speedFieldType": "num",
+        "x": 840,
+        "y": 1220,
+        "wires": [
+            [
+                "d0ff54fc.98bd98"
+            ]
+        ]
+    },
+    {
+        "id": "d9f733ba.91759",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "event DB create",
+        "info": "CREATE TABLE `esp-door`. ( `id` SERIAL NOT NULL , `type` VARCHAR(20) NOT NULL , `src` VARCHAR(20) NOT NULL , `description` VARCHAR(40) NOT NULL , `data` VARCHAR(20) NOT NULL , `time` TIMESTAMP NOT NULL ) ENGINE = InnoDB;",
+        "x": 120,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "93035a62.342298",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 600,
+        "y": 1120,
+        "wires": [
+            [
+                "b329b1e4.73a9"
+            ]
+        ]
+    },
+    {
+        "id": "612d7f33.4b2da",
+        "type": "ui_list",
+        "z": "5da0880e.c537d",
+        "group": "3593b017.0613f",
+        "name": "LIST_ACCESS",
+        "order": 7,
+        "width": "12",
+        "height": "11",
+        "lineType": "two",
+        "actionType": "click",
+        "allowHTML": true,
+        "x": 1320,
+        "y": 2160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2cb41425.6b7a0c",
+        "type": "inject",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "x": 130,
+        "y": 2040,
+        "wires": [
+            [
+                "70617ff5.2e8b7"
+            ]
+        ]
+    },
+    {
+        "id": "6900deea.ba36e",
+        "type": "comment",
+        "z": "5da0880e.c537d",
+        "name": "Loogging Display on GUI",
+        "info": "",
+        "x": 150,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "18fca357.5ae96d",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "PREPARE ACCESS LOG",
+        "func": "\n\nvar options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};\n\nvar optionsTime = { timeZone:\"Europe/Berlin\", hour12 : false, hour:  \"2-digit\", minute: \"2-digit\", second: \"2-digit\"};\n\ntablelog=[];\n\nfor (index = 0; index < msg.payload.length; ++index) {\n    var json = new Object();\n    var datum =  new Date( msg.payload[index].time*1000);\n    json.title = datum.toLocaleDateString(\"de-DE\", options) + \" \" + datum.toLocaleTimeString(\"de-DE\",optionsTime);\n    json.description=\"User: \" +msg.payload[index].username +\" - Door: \" + msg.payload[index].door;\n    if (msg.payload[index].isknown == 1)\n        json.icon=\"http://192.168.2.110/img/unlock.png\";\n    else\n        json.icon=\"http://192.168.2.110/img/lock.png\";\n    tablelog.push(json);\n}\nmsg.payload = tablelog;\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1070,
+        "y": 2180,
+        "wires": [
+            [
+                "612d7f33.4b2da",
+                "cdc282ea.976f8"
+            ]
+        ]
+    },
+    {
+        "id": "cdc282ea.976f8",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1310,
+        "y": 2200,
+        "wires": []
+    },
+    {
+        "id": "254cf4f3.0c522c",
+        "type": "ui_list",
+        "z": "5da0880e.c537d",
+        "group": "e96ae11.a1dd42",
+        "name": "LIST_EVENTS",
+        "order": 7,
+        "width": "12",
+        "height": "11",
+        "lineType": "two",
+        "actionType": "click",
+        "allowHTML": true,
+        "x": 1320,
+        "y": 1760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3a0fc33f.5ecb7c",
+        "type": "inject",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "x": 130,
+        "y": 1660,
+        "wires": [
+            [
+                "abf5adde.d9f41"
+            ]
+        ]
+    },
+    {
+        "id": "24372f1d.3a7d1",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "PREPARE EVENTS LOG",
+        "func": "\nvar options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};\nvar optionsTime = { timeZone:\"Europe/Berlin\", hour12 : false, hour:  \"2-digit\", minute: \"2-digit\", second: \"2-digit\"};\ntablelog=[];\n\nfor (index = 0; index < msg.payload.length; ++index) {\n    var json = new Object();\n    var datum =  new Date( msg.payload[index].time*1000);\n    json.title = datum.toLocaleDateString(\"de-DE\", options) + \" \" + datum.toLocaleTimeString(\"de-DE\",optionsTime);\n    json.description=msg.payload[index].type +\" \"+ msg.payload[index].src +\" \"+ msg.payload[index].description +\" \"+ msg.payload[index].data  +\" - Door: \" + msg.payload[index].door ;\n    \n    if (msg.payload[index].type == \"INFO\")\n        json.icon=\"http://192.168.2.110/img/info.png\";\n    else if (msg.payload[index].type == \"WARN\")\n        json.icon=\"http://192.168.2.110/img/warn.png\";\n    else\n        json.icon=\"http://192.168.2.110/img/warn.png\";\n        \n    tablelog.push(json);\n}\nmsg.payload = tablelog;\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1070,
+        "y": 1780,
+        "wires": [
+            [
+                "254cf4f3.0c522c",
+                "61f1b48a.6412fc"
+            ]
+        ]
+    },
+    {
+        "id": "41cb3cc0.a5f3d4",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1750,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "ef05f4c1.2ddc38",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "e96ae11.a1dd42",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "refresh",
+        "payloadType": "str",
+        "topic": "",
+        "x": 100,
+        "y": 1600,
+        "wires": [
+            [
+                "abf5adde.d9f41"
+            ]
+        ]
+    },
+    {
+        "id": "89049b8b.58fd68",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "e96ae11.a1dd42",
+        "order": 5,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "label": "Del Log",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1300,
+        "y": 1520,
+        "wires": [
+            [
+                "faf8ea8d.176ae8"
+            ]
+        ]
+    },
+    {
+        "id": "a1c93ead.abd9a",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "e96ae11.a1dd42",
+        "order": 2,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "label": "<<",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1290,
+        "y": 1580,
+        "wires": [
+            [
+                "b4e9991c.287b78"
+            ]
+        ]
+    },
+    {
+        "id": "b270a3f4.c3ed4",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "e96ae11.a1dd42",
+        "order": 4,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "label": ">>",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1290,
+        "y": 1700,
+        "wires": [
+            [
+                "f1843205.3a7a9"
+            ]
+        ]
+    },
+    {
+        "id": "e0c9c93c.9ece68",
+        "type": "ui_text",
+        "z": "5da0880e.c537d",
+        "group": "e96ae11.a1dd42",
+        "order": 3,
+        "width": "2",
+        "height": "1",
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 1290,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "abf5adde.d9f41",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "REFRESH EVENTS",
+        "func": "msg.topic = \"SELECT COUNT(*) FROM events;\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 1600,
+        "wires": [
+            [
+                "e986f181.a5b3d"
+            ]
+        ]
+    },
+    {
+        "id": "e986f181.a5b3d",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 280,
+        "y": 1800,
+        "wires": [
+            [
+                "50d57b25.b09744"
+            ]
+        ]
+    },
+    {
+        "id": "2a95f935.2ca0a6",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Set Context page count",
+        "func": "var counter = msg.payload[0]['COUNT(*)'];\nvar page = 10;\n\nvar page_count = Math.trunc(counter / page);\nflow.set(\"page_size\",page);\nflow.set(\"page_count_events\", page_count);\nflow.set(\"page_sel_events\",0);\nvar limit = \"0,\"+page;\n\nmsg.payload = \"0 of \"+page_count;\nmsg.topic = \"SELECT * FROM events ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 670,
+        "y": 1600,
+        "wires": [
+            [
+                "e0c9c93c.9ece68",
+                "917e5587.311f78"
+            ]
+        ]
+    },
+    {
+        "id": "917e5587.311f78",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 860,
+        "y": 1780,
+        "wires": [
+            [
+                "24372f1d.3a7d1"
+            ]
+        ]
+    },
+    {
+        "id": "b4e9991c.287b78",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "modify page count",
+        "func": "pagesize   = flow.get(\"page_size\");\npage_count = flow.get(\"page_count_events\");\n//var page_count = Math.trunc(page_count / pagesize);\npage       = flow.get(\"page_sel_events\");\n\npage = page - 1;\n\nif (page < 0){\n    page = page_count;    \n}\nlimit = pagesize*(page) +\",\"+pagesize;\n\nflow.set(\"page_sel_events\",page)\nmsg.payload = page +\" of \"+ page_count;\nmsg.topic = \"SELECT * FROM events ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1490,
+        "y": 1580,
+        "wires": [
+            [
+                "e0c9c93c.9ece68",
+                "41cb3cc0.a5f3d4",
+                "315645fd.37886a"
+            ]
+        ]
+    },
+    {
+        "id": "f1843205.3a7a9",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "modify page count",
+        "func": "pagesize   = flow.get(\"page_size\");\npage_count = flow.get(\"page_count_events\");\n//var page_count = Math.trunc(page_count / pagesize);\npage       = flow.get(\"page_sel_events\");\n\npage = page + 1;\nif (page > page_count){\n    page = 0;\n    limit = pagesize*page +\",\"+pagesize;\n}else{\n    limit = pagesize*page +\",\"+pagesize;\n}\n\nflow.set(\"page_sel_events\",page)\nmsg.payload = msg.payload = page +\" of \"+ page_count;\nmsg.topic = \"SELECT * FROM events ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1490,
+        "y": 1700,
+        "wires": [
+            [
+                "e0c9c93c.9ece68",
+                "41cb3cc0.a5f3d4",
+                "315645fd.37886a"
+            ]
+        ]
+    },
+    {
+        "id": "66cd3079.24f93",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1730,
+        "y": 2040,
+        "wires": []
+    },
+    {
+        "id": "a2f75be.9e5b1a8",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "3593b017.0613f",
+        "order": 2,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "label": "<<",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1290,
+        "y": 1980,
+        "wires": [
+            [
+                "1721bbbd.cf8b34"
+            ]
+        ]
+    },
+    {
+        "id": "17f56dc.38cb792",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "3593b017.0613f",
+        "order": 4,
+        "width": "1",
+        "height": "1",
+        "passthru": false,
+        "label": ">>",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1290,
+        "y": 2100,
+        "wires": [
+            [
+                "1b083d88.ed6422"
+            ]
+        ]
+    },
+    {
+        "id": "c82ddf87.33c4b",
+        "type": "ui_text",
+        "z": "5da0880e.c537d",
+        "group": "3593b017.0613f",
+        "order": 3,
+        "width": "2",
+        "height": "1",
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "x": 1290,
+        "y": 2040,
+        "wires": []
+    },
+    {
+        "id": "1721bbbd.cf8b34",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "modify page count",
+        "func": "pagesize   = flow.get(\"page_size_access\");\npage_count = flow.get(\"page_count_events_access\");\n//var page_count = Math.trunc(page_count / pagesize);\npage       = flow.get(\"page_sel_events_access\");\n\npage = page - 1;\n\nif (page < 0){\n    page = page_count;    \n}\nlimit = pagesize*(page) +\",\"+pagesize;\n\nflow.set(\"page_sel_events_access\",page)\nmsg.payload = page +\" of \"+ page_count;\nmsg.topic = \"SELECT * FROM accesslog ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1470,
+        "y": 1980,
+        "wires": [
+            [
+                "c82ddf87.33c4b",
+                "66cd3079.24f93",
+                "80bb7cf5.14a38"
+            ]
+        ]
+    },
+    {
+        "id": "1b083d88.ed6422",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "modify page count",
+        "func": "pagesize   = flow.get(\"page_size_access\");\npage_count = flow.get(\"page_count_events_access\");\n//var page_count = Math.trunc(page_count / pagesize);\npage       = flow.get(\"page_sel_events_access\");\n\npage = page + 1;\nif (page > page_count){\n    page = 0;\n    limit = pagesize*page +\",\"+pagesize;\n}else{\n    limit = pagesize*page +\",\"+pagesize;\n}\n\nflow.set(\"page_sel_events_access\",page)\nmsg.payload = msg.payload = page +\" of \"+ page_count;\nmsg.topic = \"SELECT * FROM accesslog ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1470,
+        "y": 2100,
+        "wires": [
+            [
+                "c82ddf87.33c4b",
+                "66cd3079.24f93",
+                "80bb7cf5.14a38"
+            ]
+        ]
+    },
+    {
+        "id": "7305d0e4.4d34f",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "3593b017.0613f",
+        "order": 1,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "refresh",
+        "payloadType": "str",
+        "topic": "",
+        "x": 100,
+        "y": 1980,
+        "wires": [
+            [
+                "70617ff5.2e8b7"
+            ]
+        ]
+    },
+    {
+        "id": "70617ff5.2e8b7",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "REFRESH ACCESSLOG",
+        "func": "msg.topic = \"SELECT COUNT(*) FROM accesslog;\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 370,
+        "y": 1980,
+        "wires": [
+            [
+                "e986f181.a5b3d"
+            ]
+        ]
+    },
+    {
+        "id": "44e86277.84644c",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Set Context page count",
+        "func": "var counter = msg.payload[0]['COUNT(*)'];\nvar page = 10;\n\nvar page_count = Math.trunc(counter / page);\nflow.set(\"page_size_access\",page);\nflow.set(\"page_count_events_access\", page_count);\nflow.set(\"page_sel_events_access\",0);\nvar limit = \"0,\"+page;\n\nmsg.payload = \"0 of \"+page_count;\nmsg.topic = \"SELECT * FROM accesslog ORDER BY id DESC LIMIT \"+limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 670,
+        "y": 1980,
+        "wires": [
+            [
+                "bf12f045.f0481",
+                "c82ddf87.33c4b"
+            ]
+        ]
+    },
+    {
+        "id": "bf12f045.f0481",
+        "type": "mysql",
+        "z": "5da0880e.c537d",
+        "mydb": "833fda8f.b825a8",
+        "name": "esp-door",
+        "x": 860,
+        "y": 2180,
+        "wires": [
+            [
+                "18fca357.5ae96d"
+            ]
+        ]
+    },
+    {
+        "id": "61f1b48a.6412fc",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1310,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "f2ea7896.04b608",
+        "type": "ui_button",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "group": "3593b017.0613f",
+        "order": 5,
+        "width": "3",
+        "height": "1",
+        "passthru": false,
+        "label": "Del Log",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1300,
+        "y": 1920,
+        "wires": [
+            [
+                "d5d42f44.83bec"
+            ]
+        ]
+    },
+    {
+        "id": "d5d42f44.83bec",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Delete ACCESSLOG",
+        "func": "msg.topic = \"TRUNCATE TABLE accesslog;\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1480,
+        "y": 1920,
+        "wires": [
+            [
+                "80bb7cf5.14a38"
+            ]
+        ]
+    },
+    {
+        "id": "faf8ea8d.176ae8",
+        "type": "function",
+        "z": "5da0880e.c537d",
+        "name": "Delete EVENTSLOG",
+        "func": "msg.topic = \"TRUNCATE TABLE events;\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1500,
+        "y": 1520,
+        "wires": [
+            [
+                "315645fd.37886a"
+            ]
+        ]
+    },
+    {
+        "id": "b329b1e4.73a9",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "NEW_ENTRY_DB",
+        "links": [
+            "36d1ce90.0ebc42",
+            "964c4c17.e613b",
+            "dba1660e.c57a98"
+        ],
+        "x": 735,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "964c4c17.e613b",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "b329b1e4.73a9"
+        ],
+        "x": 55,
+        "y": 1540,
+        "wires": [
+            [
+                "abf5adde.d9f41"
+            ]
+        ]
+    },
+    {
+        "id": "dba1660e.c57a98",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "b329b1e4.73a9"
+        ],
+        "x": 55,
+        "y": 1920,
+        "wires": [
+            [
+                "70617ff5.2e8b7"
+            ]
+        ]
+    },
+    {
+        "id": "c62d4abc.814448",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "TRIGGER_EVENT_DB",
+        "links": [
+            "315645fd.37886a"
+        ],
+        "x": 735,
+        "y": 1780,
+        "wires": [
+            [
+                "917e5587.311f78"
+            ]
+        ]
+    },
+    {
+        "id": "315645fd.37886a",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "c62d4abc.814448"
+        ],
+        "x": 1695,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "703d26ed.66a4f8",
+        "type": "link in",
+        "z": "5da0880e.c537d",
+        "name": "TRIGGER_ACESSLOG_DB",
+        "links": [
+            "80bb7cf5.14a38"
+        ],
+        "x": 735,
+        "y": 2180,
+        "wires": [
+            [
+                "bf12f045.f0481"
+            ]
+        ]
+    },
+    {
+        "id": "80bb7cf5.14a38",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "703d26ed.66a4f8"
+        ],
+        "x": 1675,
+        "y": 1980,
+        "wires": []
+    },
+    {
+        "id": "daf8fd1a.da744",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "topic",
+        "targetType": "msg",
+        "x": 1740,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "76d1bd85.2eed64",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "DELETE FROM newuser WHERE uid",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "INSERT INTO users",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1550,
+        "y": 520,
+        "wires": [
+            [
+                "daf8fd1a.da744",
+                "7a6e89ba.af0c98"
+            ],
+            [
+                "be205a5f.b1b658"
+            ]
+        ]
+    },
+    {
+        "id": "7a6e89ba.af0c98",
+        "type": "link out",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "links": [
+            "36d1ce90.0ebc42"
+        ],
+        "x": 1695,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "bebaa6f9.d7a698",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "Select * from users",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "INSERT INTO users",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1490,
+        "y": 940,
+        "wires": [
+            [
+                "6e35c1b2.06214"
+            ],
+            [
+                "d5b6f03.c3ba11"
+            ]
+        ]
+    },
+    {
+        "id": "50d57b25.b09744",
+        "type": "switch",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "SELECT COUNT(*) FROM events",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "SELECT COUNT(*) FROM accesslog",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 1800,
+        "wires": [
+            [
+                "2a95f935.2ca0a6"
+            ],
+            [
+                "44e86277.84644c"
+            ]
+        ]
+    },
+    {
+        "id": "1ab00e98.cef0c1",
+        "type": "debug",
+        "z": "5da0880e.c537d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 610,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "c264cdd5.9ebcc8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "IOT",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "833fda8f.b825a8",
+        "type": "MySQLdatabase",
+        "z": "",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "esp-door",
+        "tz": ""
+    },
+    {
+        "id": "f74cd7d7.b7cdc8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Reader List",
+        "tab": "f0b5fcb6.816c7",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": true
+    },
+    {
+        "id": "27ac83fc.9d43cc",
+        "type": "ui_group",
+        "z": "",
+        "name": "User List",
+        "tab": "f0b5fcb6.816c7",
+        "order": 2,
+        "disp": true,
+        "width": "12",
+        "collapse": true
+    },
+    {
+        "id": "9f2672e3.3b8cd",
+        "type": "ui_group",
+        "z": "",
+        "name": "Unknown RFID",
+        "tab": "f0b5fcb6.816c7",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": true
+    },
+    {
+        "id": "3593b017.0613f",
+        "type": "ui_group",
+        "z": "",
+        "name": "Access Log",
+        "tab": "f0b5fcb6.816c7",
+        "order": 5,
+        "disp": true,
+        "width": "12",
+        "collapse": true
+    },
+    {
+        "id": "e96ae11.a1dd42",
+        "type": "ui_group",
+        "z": "",
+        "name": "Event Logs",
+        "tab": "f0b5fcb6.816c7",
+        "order": 4,
+        "disp": true,
+        "width": "12",
+        "collapse": true
+    },
+    {
+        "id": "f0b5fcb6.816c7",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Door",
+        "icon": "dashboard",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    }
+]
