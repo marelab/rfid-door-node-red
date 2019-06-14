@@ -1,8 +1,13 @@
 # rfid-door-node-red
 A complete Node Red Web Control to monitor &amp; control multiple rfid-door hardware devices
 
-This is a complete Node-Red flow to manage multiple marelab [RFID-DOOR](https://github.com/marelab/rfid-door) or [ESP-RFID](https://github.com/esprfid/esp-rfid) open hard/software Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configure the needed setting you get a Web GUI with the following functionality. The hole communication is done over MQTT. The GUI can be also accessed over cell phone / tablett. Atm the focus was but to get it feature complete and not fancy as hell.
+This is a complete Node-Red flow to manage multiple marelab [RFID-DOOR](https://github.com/marelab/rfid-door) or [ESP-RFID](https://github.com/esprfid/esp-rfid) opensource hard/software Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configure the needed settings, you get a Web GUI with the following functionality. The hole communication is done over MQTT. The GUI can be also accessed over cell phone / tablett. Atm the focus was but to get it feature complete and not fancy as hell.
+Its also possible to setup a selfmade board just using the ESP8266 for it use the schematic to see how
 
+* A ready to use marelab RFID-DOOR board or a pcb can be ordered here at the [marlab.org](https://www.marelab.org/smart-home-diy/rfid-door-system) webside.
+* The openhardware schematic & gerbers files and KiCad Project can be found at [marelab RFID-DOOR](https://github.com/marelab/rfid-door)
+* More detailed Instuctions to that flow can be found on the GitHub Project pages [rfid-door-node-red](https://github.com/marelab/rfid-door-node-red)
+The flow uses several additional Nodes that have to get installed to!
 
 Features:
 * Central managment & administration GUI to manage device, users access
