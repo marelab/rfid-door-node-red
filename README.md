@@ -3,6 +3,12 @@ A complete Node Red Web Control to monitor &amp; control multiple rfid-door hard
 
 This is a complete Node-Red flow to manage multiple marelab RFID-DOOR or ESP-RFID Door access controls over a Node-Red based home automatisation system. When you follow the tutrial here and configure the needed setting you get a Web GUI with the following functionality. The hole communication is done over MQTT. The hole implementation might be optimaized in the future. The GUI can be also accessed over cell phone / tablett. Atm the focus was but to get it feature complete and not fancy as hell.
 
+
+Features:
+* Central managment & administration GUI to manage device, users access
+* Central event and access store to visualize what happen when and on which device
+* Remote opening Door over GUI or voice with Google home or Alexa 
+
 # GUI Overview 
 
 ## Dialog GUI to manage RFID devices
@@ -62,7 +68,7 @@ The installation is very easy just download it and import it over the node-red f
 
 ## Configure the marelab rfid-door-node-red flow
 After the flow is installed you need to configure some items of the flow. That can't be done automatic. Follow these steps to get it to work correct:
-* Import the database shema / tables into mysql use the SQL rfidDb.sql for that
+* Import the database shema / tables into mysql use the SQL esp-door-install-DB.sql for that
 * enter the DB IP adress & user/password in one of the DB nodes all other will then use that info automatic
 * enter the MQTT Server IP adress user/password in the MQTT nodes
 
